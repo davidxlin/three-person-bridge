@@ -57,11 +57,31 @@ class Board {
         }
     }
 
-    public diagram(): string {
-        const west = this.getHand("player1-hand")
-        const south = this.getHand("player2-hand")
-        const east = this.getHand("player3-hand")
+    public diagram(declarer: string): string {
         const north = this.getHand("dummy-hand")
+        const south = this.getHand(`${declarer}-hand`)
+        const west = (() => {
+            switch (declarer) {
+                case "player1":
+                    return this.getHand("player3-hand")
+                case "player2":
+                    return this.getHand("player1-hand")
+                case "player3":
+                    return this.getHand("player2-hand")
+                default:
+                    throw new Error(`invalid declarer: ${declarer}`)
+        }})()
+        const east = (() => {
+            switch (declarer) {
+                case "player1":
+                    return this.getHand("player2-hand")
+                case "player2":
+                    return this.getHand("player3-hand")
+                case "player3":
+                    return this.getHand("player1-hand")
+                default:
+                    throw new Error(`invalid declarer: ${declarer}`)
+        }})()
 
         const formatNorthOrSouthHand = (hand: Hand) => 
             hand.diagram()
@@ -78,8 +98,8 @@ class Board {
 
         const northLines = formatNorthOrSouthHand(north)
         const southLines = formatNorthOrSouthHand(south)
+        console.log(northLines)
         return `${northLines}\n${westAndEastLines}\n${southLines}`
-        // \n${westAndEastLines}\n${formatNorthOrSouthHand(south)}
     }
 
     private shuffleArray(array: Object[]) {

@@ -11,7 +11,14 @@ const command : Command = {
         } else if (args[1] == "newgame") {
             board.shuffle()
         } else if (args[1] == "diagram") {
-            message.channel.send(`\`\`\`${board.diagram()}\`\`\``)
+            if (args.length < 3) {
+                message.channel.send(`This call requires the declarer to be entered as a parameter!`)
+            }
+            try {
+                message.channel.send(`\`\`\`${board.diagram(args[2])}\`\`\``)
+            } catch (e: any) {
+                message.channel.send(`An error occured in producing the diagram`)
+            }
             return
         } else if (!board.handOptions.includes(args[1])) {
             message.channel.send(`Invalid parameter!`)
