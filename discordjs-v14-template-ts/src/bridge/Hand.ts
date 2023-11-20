@@ -20,7 +20,6 @@ export class Hand {
                         })
                         .map(card => card.rank)
                         .join("")
-                        .padEnd(13)
     }
 
     public diagram(): string {

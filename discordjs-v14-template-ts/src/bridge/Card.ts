@@ -11,7 +11,6 @@ export class Card {
     }
 
     public isHigherRank(card: Card): boolean {
-
         return Card.ranks.indexOf(this.rank) > Card.ranks.indexOf(card.rank)
     }
 }
