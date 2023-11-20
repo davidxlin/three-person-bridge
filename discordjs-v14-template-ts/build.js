@@ -10,7 +10,7 @@ const main = () => {
     exec("tsc", (err, stdout, stderr) => {
         if (err) {
             console.log(chalk.hex(themeColors.error)("Build failed with the following error: "));
-            console.log(chalk.hex(themeColors.error)(stdout));
+            console.log(chalk.hex(themeColors.error)(err));
             return;
         }
         console.log(chalk.hex(themeColors.text)(`Build successful! You can start the bot by running ${chalk.hex(themeColors.variable)("npm start")}\n`));
