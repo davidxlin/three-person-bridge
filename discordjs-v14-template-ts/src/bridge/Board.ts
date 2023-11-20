@@ -49,7 +49,7 @@ class Board {
                 return new Hand(this.cards.slice(43, 47))
             }
             case "player3-dummy-preview": {
-                return new Hand(this.cards.slice(47, 50))
+                return new Hand(this.cards.slice(47, 51))
             }
             default: {
                 throw new Error(`invalid getHand option: ${option}`)
