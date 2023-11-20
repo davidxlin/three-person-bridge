@@ -1,16 +1,16 @@
 import { Card } from './Card'
 import { Hand } from './Hand'
 
-export class Board {
+class Board {
 
-    static readonly handOptions = [
-        "player1 hand",
-        "player1 dummy preview",
-        "player2 hand",
-        "player2 dummy preview",
-        "player3 hand",
-        "player3 dummy preview",
-        "dummy hand",
+    readonly handOptions = [
+        "player1-hand",
+        "player1-dummy-preview",
+        "player2-hand",
+        "player2-dummy-preview",
+        "player3-hand",
+        "player3-dummy-preview",
+        "dummy-hand",
     ]
 
     private cards: Card[]
@@ -22,34 +22,37 @@ export class Board {
                 this.cards.push(new Card(suit, rank))
             })
         })
+    }
+
+    public shuffle() {
         this.shuffleArray(this.cards)
     }
 
     public getHand(option: string): Hand {
         switch (option) {
-            case "player1 hand": { 
+            case "player1-hand": { 
                 return new Hand(this.cards.slice(0, 13))
             } 
-            case "player2 hand": { 
+            case "player2-hand": { 
                 return new Hand(this.cards.slice(13, 26))
             }
-            case "player3 hand": {
+            case "player3-hand": {
                 return new Hand(this.cards.slice(26, 39))
             }
-            case "dummy hand": {
+            case "dummy-hand": {
                 return new Hand(this.cards.slice(39, 52))
             }
-            case "player1 dummy preview": {
+            case "player1-dummy-preview": {
                 return new Hand(this.cards.slice(39, 43))
             }
-            case "player2 dummy preview": {
+            case "player2-dummy-preview": {
                 return new Hand(this.cards.slice(43, 47))
             }
-            case "player3 dummy preview": {
+            case "player3-dummy-preview": {
                 return new Hand(this.cards.slice(47, 50))
             }
             default: {
-                throw new Error("invalid getHand option")
+                throw new Error(`invalid getHand option: ${option}`)
             }
         }
     }
@@ -63,3 +66,6 @@ export class Board {
         }
     }
 }
+
+const board = new Board()
+export default board
