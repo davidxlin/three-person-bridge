@@ -10,6 +10,9 @@ const command : Command = {
             return
         } else if (args[1] == "newgame") {
             board.shuffle()
+        } else if (args[1] == "diagram") {
+            message.channel.send(`\`\`\`${board.diagram()}\`\`\``)
+            return
         } else if (!board.handOptions.includes(args[1])) {
             message.channel.send(`Invalid parameter!`)
             return
