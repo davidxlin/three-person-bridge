@@ -6,10 +6,11 @@ const command : Command = {
     name: "bridge",
     execute: (message, args) => {
         const board = new Board()
-        Board.getHandOptions.forEach(option => {
-            message.channel.send(option)
-            message.channel.send(`||\`\`\`${board.getHand(option).diagram()}\`\`\`||`)
-        })
+        const outputMessage = Board.handOptions.map(option => {
+                return `${option}\n||\`\`\`${board.getHand(option).diagram()}\`\`\`||`
+            })
+            .join("\n")
+        message.channel.send(`${outputMessage}`)
     },
     cooldown: 10,
     aliases: [],

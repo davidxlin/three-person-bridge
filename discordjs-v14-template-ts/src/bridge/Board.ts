@@ -3,7 +3,7 @@ import { Hand } from './Hand'
 
 export class Board {
 
-    static readonly getHandOptions = [
+    static readonly handOptions = [
         "player1 hand",
         "player1 dummy preview",
         "player2 hand",
