@@ -8,7 +8,7 @@ const command : Command = {
         const board = new Board()
         Board.getHandOptions.forEach(option => {
             message.channel.send(option)
-            message.channel.send(`||${board.getHand(option).diagram()}||`)
+            message.channel.send(`||\`\`\`${board.getHand(option).diagram()}\`\`\`||`)
         })
     },
     cooldown: 10,

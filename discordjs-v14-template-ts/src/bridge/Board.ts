@@ -16,11 +16,9 @@ export class Board {
     private cards: Card[]
 
     public constructor() {
-        const suits = "SHDC".split("")
-        const ranks = "23456789TJQKA".split("")
         this.cards = []
-        suits.forEach(suit => {
-            ranks.forEach(rank => {
+        Card.suits.forEach(suit => {
+            Card.ranks.forEach(rank => {
                 this.cards.push(new Card(suit, rank))
             })
         })
