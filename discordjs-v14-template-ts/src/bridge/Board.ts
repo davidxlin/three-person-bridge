@@ -98,7 +98,6 @@ class Board {
 
         const northLines = formatNorthOrSouthHand(north)
         const southLines = formatNorthOrSouthHand(south)
-        console.log(northLines)
         return `${northLines}\n${westAndEastLines}\n${southLines}`
     }
 
