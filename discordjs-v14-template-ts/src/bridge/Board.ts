@@ -42,8 +42,8 @@ class Board {
         this.playedCards.push(this.cards.find(card => card.suit == suit && card.rank == rank)!)
     }
 
-    public isCardPlayed(suit: string, rank: string): boolean {
-        return this.playedCards.find(card => card.suit == suit && card.rank == rank) !== undefined
+    public claim() {
+        this.cards.forEach(card => this.playCard(card.suit, card.rank))
     }
 
     public getHand(option: string): Hand {

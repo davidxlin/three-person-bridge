@@ -149,11 +149,25 @@ const boardCommand: SlashCommand = {
     }
 }
 
+const claimCommand: SlashCommand = {
+    command: new SlashCommandBuilder()
+     .setName("claim")
+     .setDescription("Reveals all played cards."),
+     execute: interaction => {
+        board.claim()
+        boardInteractions.forEach(tuple => {
+            tuple[0].editReply(`\`\`\`${board.diagram(tuple[1], tuple[2])}\`\`\``)
+        })
+        interaction.reply("Successfully revealed all cards.")
+     }
+}
+
 const bridgeCommands = [
     shuffleCommand,
     handCommand,
     dummyCommand,
     dummyPreviewCommand,
     boardCommand,
+    claimCommand,
 ]
 export default bridgeCommands;
