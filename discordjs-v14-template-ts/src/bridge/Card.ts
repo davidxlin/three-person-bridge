@@ -13,4 +13,8 @@ export class Card {
     public isHigherRank(card: Card): boolean {
         return Card.ranks.indexOf(this.rank) > Card.ranks.indexOf(card.rank)
     }
+
+    public isHigherSuit(card: Card): boolean {
+        return Card.suits.indexOf(this.suit) < Card.suits.indexOf(card.suit)
+    }
 }

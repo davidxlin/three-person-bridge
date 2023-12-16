@@ -2,7 +2,6 @@ import { Card } from './Card'
 import { Hand } from './Hand'
 
 class Board {
-
     readonly handOptions = [
         "player1-hand",
         "player1-dummy-preview",
