@@ -4,6 +4,7 @@ import { readdirSync } from "fs";
 import { join } from "path";
 import { color } from "../functions";
 import { Command, SlashCommand } from "../types";
+import bridgeCommands from "../slashCommands/bridge"
 
 module.exports = (client : Client) => {
     const slashCommands : SlashCommandBuilder[] = []
@@ -12,9 +13,13 @@ module.exports = (client : Client) => {
     let slashCommandsDir = join(__dirname,"../slashCommands")
     let commandsDir = join(__dirname,"../commands")
 
-    readdirSync(slashCommandsDir).forEach(file => {
-        if (!file.endsWith(".js")) return;
-        let command : SlashCommand = require(`${slashCommandsDir}/${file}`).default
+    // readdirSync(slashCommandsDir).forEach(file => {
+    //     if (!file.endsWith(".js")) return;
+    //     let command : SlashCommand = require(`${slashCommandsDir}/${file}`).default
+    //     slashCommands.push(command.command)
+    //     client.slashCommands.set(command.command.name, command)
+    // })
+    bridgeCommands.forEach(command => {
         slashCommands.push(command.command)
         client.slashCommands.set(command.command.name, command)
     })

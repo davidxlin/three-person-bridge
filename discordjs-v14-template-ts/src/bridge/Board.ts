@@ -13,6 +13,7 @@ class Board {
     ]
 
     private cards: Card[]
+    private playedCards: Card[]
 
     public constructor() {
         this.cards = []
@@ -21,6 +22,7 @@ class Board {
                 this.cards.push(new Card(suit, rank))
             })
         })
+        this.playedCards = []
     }
 
     public shuffle() {
@@ -33,6 +35,15 @@ class Board {
             }
         }
         shuffleArray(this.cards)
+        this.playedCards = []
+    }
+
+    public playCard(suit: string, rank: string) {
+        this.playedCards.push(this.cards.find(card => card.suit == suit && card.rank == rank)!)
+    }
+
+    public isCardPlayed(suit: string, rank: string): boolean {
+        return this.playedCards.find(card => card.suit == suit && card.rank == rank) !== undefined
     }
 
     public getHand(option: string): Hand {
@@ -62,6 +73,43 @@ class Board {
                 throw new Error(`invalid getHand option: ${option}`)
             }
         }
+    }
+
+    public diagram(southPlayer: string, declarer: string): string {
+        const order = (() => {
+            switch (declarer) {
+                case "player1":
+                    return ["player1", "player2", "dummy", "player3"]
+                case "player2":
+                    return ["player2", "player3", "dummy", "player1"]
+                case "player3":
+                    return ["player3", "player1", "dummy", "player2"]
+                default:
+                    throw new Error(`invalid declarer: ${declarer}`)
+            }
+        })()
+        const filterPlayedCards = (hand: Hand) => new Hand(hand.cards.filter(card => this.playedCards.includes(card)))
+        const south = filterPlayedCards(this.getHand(`${southPlayer}-hand`))
+        const north = filterPlayedCards(this.getHand(`${order[(order.indexOf(southPlayer) + 2) % 4]}-hand`))
+        const east = filterPlayedCards(this.getHand(`${order[(order.indexOf(southPlayer) + 3) % 4]}-hand`))
+        const west = filterPlayedCards(this.getHand(`${order[(order.indexOf(southPlayer) + 1) % 4]}-hand`))
+
+        const formatNorthOrSouthHand = (hand: Hand) => 
+            hand.diagram()
+                .split("\n")
+                .map((suit: string) => `${" ".repeat(13)}${suit.slice(3)}`)
+                .join("\n")
+        
+        const westLines = west.diagram().split("\n")
+        const eastLines = east.diagram().split("\n")
+        const westAndEastLines = westLines.map((suit: string, i: number) => 
+                `${suit.slice(3).padEnd(13)}${" ".repeat(13)}${eastLines[i].slice(3)}`
+            )
+            .join("\n")
+
+        const northLines = formatNorthOrSouthHand(north)
+        const southLines = formatNorthOrSouthHand(south)
+        return `${northLines}\n${westAndEastLines}\n${southLines}`
     }
 }
 
