@@ -7,7 +7,7 @@ export class Hand {
         this.cards = cards
     }
 
-    private suitString(suit: string) {
+    private suit(suit: string): Card[] {
         return this.cards.filter(card => card.suit == suit)
                         .sort((card1, card2) => {
                             if (card1.rank == card2.rank) {
@@ -18,15 +18,5 @@ export class Hand {
                                 return 1;
                             }
                         })
-                        .map(card => card.rank)
-                        .join("")
-    }
-
-    public diagram(): string {
-        const spades = this.suitString("S")
-        const hearts = this.suitString("H")
-        const diamonds = this.suitString("D")
-        const clubs = this.suitString("C")
-        return `S: ${spades}\nH: ${hearts}\nD: ${diamonds}\nC: ${clubs}`
     }
 }
