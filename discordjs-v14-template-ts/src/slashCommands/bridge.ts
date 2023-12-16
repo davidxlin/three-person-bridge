@@ -80,16 +80,13 @@ const handCommand: SlashCommand = {
         .setMaxValue(3)
         .setMinValue(1)
         .setDescription("Player number")
+        .setRequired(true)
      }),
      execute: async interaction => {
-        try {
-            const playerNumber = Number(interaction.options.get("player")!.value)
-            const hand = board.getHand(`player${playerNumber}-hand`)
-            const message = `Player ${playerNumber}'s interactable hand:`
-            createInteractableHand(interaction, hand, message)
-        } catch (e) {
-            interaction.reply(e)
-        }
+        const playerNumber = Number(interaction.options.get("player")!.value)
+        const hand = board.getHand(`player${playerNumber}-hand`)
+        const message = `Player ${playerNumber}'s interactable hand:`
+        createInteractableHand(interaction, hand, message)
      } 
 }
 
@@ -103,16 +100,13 @@ const dummyPreviewCommand: SlashCommand = {
          .setMaxValue(3)
          .setMinValue(1)
          .setDescription("Player number")
+         .setRequired(true)
      }),
      execute: async interaction => {
-        try {
-            const playerNumber = Number(interaction.options.get("player")!.value)
-            const hand = board.getHand(`player${playerNumber}-dummy-preview`)
-            const message = `Player ${playerNumber}'s dummy preview:`
-            createInteractableHand(interaction, hand, message)
-        } catch (e) {
-            interaction.reply(e)
-        }
+        const playerNumber = Number(interaction.options.get("player")!.value)
+        const hand = board.getHand(`player${playerNumber}-dummy-preview`)
+        const message = `Player ${playerNumber}'s dummy preview:`
+        createInteractableHand(interaction, hand, message)
      }
 }
 
@@ -137,6 +131,7 @@ const boardCommand: SlashCommand = {
         .setMaxValue(3)
         .setMinValue(1)
         .setDescription("Player number")
+        .setRequired(true)
     })
     .addIntegerOption(option => {
         return option
@@ -144,16 +139,13 @@ const boardCommand: SlashCommand = {
          .setMaxValue(3)
          .setMinValue(1)
          .setDescription("Declarer's player number")
+         .setRequired(true)
     }),
     execute: interaction => {
-        try {
-            const southPlayer = Number(interaction.options.get("player")!.value)
-            const declarer = Number(interaction.options.get("declarer")!.value)
-            interaction.reply(`\`\`\`${board.diagram(`player${southPlayer}`, `player${declarer}`)}\`\`\``)
-            boardInteractions.push([interaction, `player${southPlayer}`, `player${declarer}`])
-        } catch (e) {
-            interaction.reply(e)
-        }
+        const southPlayer = Number(interaction.options.get("player")!.value)
+        const declarer = Number(interaction.options.get("declarer")!.value)
+        interaction.reply(`\`\`\`${board.diagram(`player${southPlayer}`, `player${declarer}`)}\`\`\``)
+        boardInteractions.push([interaction, `player${southPlayer}`, `player${declarer}`])
     }
 }
 
