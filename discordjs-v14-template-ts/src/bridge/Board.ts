@@ -60,7 +60,7 @@ class Board {
     public diagram(declarer: string): string {
         const north = this.getHand("dummy-hand")
         const south = this.getHand(`${declarer}-hand`)
-        const west = (() => {
+        const east = (() => {
             switch (declarer) {
                 case "player1":
                     return this.getHand("player3-hand")
@@ -71,7 +71,7 @@ class Board {
                 default:
                     throw new Error(`invalid declarer: ${declarer}`)
         }})()
-        const east = (() => {
+        const west = (() => {
             switch (declarer) {
                 case "player1":
                     return this.getHand("player2-hand")
