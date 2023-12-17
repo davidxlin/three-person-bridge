@@ -45,7 +45,7 @@ const createInteractableHand = async (interaction: ChatInputCommandInteraction, 
             })()
         })]))
     const buttons = Array.from(stringToButtonMap.values())
-    const rows = []
+    const rows: ActionRowBuilder<ButtonBuilder>[] = []
     for (let i = 0; i < buttons.length; i += 5) {
         const row = new ActionRowBuilder<ButtonBuilder>({
             components: buttons.slice(i, Math.min(buttons.length, i+5)),
