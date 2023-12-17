@@ -4,7 +4,7 @@ import { Card } from "../bridge/Card";
 import { Hand } from "../bridge/Hand";
 import board from "../bridge/Board"
 
-const boardInteractions = []
+const boardInteractions : any[] = []
 
 const shuffleCommand: SlashCommand = {
     command: new SlashCommandBuilder()
@@ -96,7 +96,7 @@ const handCommand: SlashCommand = {
         const hand = board.getHand(`player${playerNumber}-hand`)
         const message = `Player ${playerNumber}'s interactable hand:`
         createInteractableHand(interaction, hand, message)
-     } 
+     }
 }
 
 const dummyPreviewCommand: SlashCommand = {

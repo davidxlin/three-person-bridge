@@ -7,7 +7,7 @@ import { Command, SlashCommand } from "../types";
 import bridgeCommands from "../slashCommands/bridge"
 
 module.exports = (client : Client) => {
-    const slashCommands : SlashCommandBuilder[] = []
+    const slashCommands : SlashCommand[] = []
     const commands : Command[] = []
 
     let slashCommandsDir = join(__dirname,"../slashCommands")
@@ -20,7 +20,7 @@ module.exports = (client : Client) => {
     //     client.slashCommands.set(command.command.name, command)
     // })
     bridgeCommands.forEach(command => {
-        slashCommands.push(command.command)
+        slashCommands.push(command)
         client.slashCommands.set(command.command.name, command)
     })
 
@@ -34,7 +34,7 @@ module.exports = (client : Client) => {
     const rest = new REST({version: "10"}).setToken(process.env.TOKEN);
 
     rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
-        body: slashCommands.map(command => command.toJSON())
+        body: slashCommands.map(command => command.command.toJSON())
     })
     .then((data : any) => {
         console.log(color("text", `🔥 Successfully loaded ${color("variable", data.length)} slash command(s)`))
