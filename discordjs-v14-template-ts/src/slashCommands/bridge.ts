@@ -67,7 +67,6 @@ const createInteractableHand = async (interaction: ChatInputCommandInteraction, 
         const rank = id[5]
         board.playCard(suit, rank)
         stringToButtonMap.get(`${suit}${rank}`)!.setDisabled(true)
-        console.log("disabled")
         interaction.editReply({
             content: message,
             components: rows,
