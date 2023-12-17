@@ -17,7 +17,7 @@ const shuffleCommand: SlashCommand = {
      }
 }
 
-const createInteractableHand = async (interaction: ChatInputCommandInteraction, hand: Hand, message: string) => {
+const createInteractableHand = async (interaction: ChatInputCommandInteraction, hand: Hand, message: string, disableButtons=false) => {
     const stringToButtonMap = new Map(hand.cards
         .map((card: Card) => [
             `${card.suit}${card.rank}`,
@@ -42,7 +42,8 @@ const createInteractableHand = async (interaction: ChatInputCommandInteraction, 
                         throw new Error(`invalid suit: ${card.suit}`)
                     }
                 }
-            })()
+            })(),
+            disabled: disableButtons,
         })]))
     const buttons = Array.from(stringToButtonMap.values())
     const rows: ActionRowBuilder<ButtonBuilder>[] = []
@@ -114,7 +115,7 @@ const dummyPreviewCommand: SlashCommand = {
         const playerNumber = Number(interaction.options.get("player")!.value)
         const hand = board.getHand(`player${playerNumber}-dummy-preview`)
         const message = `Player ${playerNumber}'s dummy preview:`
-        createInteractableHand(interaction, hand, message)
+        createInteractableHand(interaction, hand, message, /* disableButtons= */ true)
      }
 }
 
