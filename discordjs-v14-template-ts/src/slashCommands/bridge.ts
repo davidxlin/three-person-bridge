@@ -72,7 +72,6 @@ const createInteractableHand = async (interaction: ChatInputCommandInteraction, 
             components: rows,
         })
         i.deferUpdate()
-        // interaction.editReply({ content: "Click a button", components: rows[0] });
         boardInteractions.forEach(tuple => {
             tuple[0].editReply(`\`\`\`${board.diagram(tuple[1], tuple[2])}\`\`\``)
         })
