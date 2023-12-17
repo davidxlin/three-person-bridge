@@ -39,7 +39,10 @@ class Board {
     }
 
     public playCard(suit: string, rank: string) {
-        this.playedCards.push(this.cards.find(card => card.suit == suit && card.rank == rank)!)
+        const card = this.cards.find(card => card.suit == suit && card.rank == rank)!
+        if (!this.playedCards.includes(card)) {
+            this.playedCards.push(card)
+        }
     }
 
     public claim() {
@@ -97,7 +100,7 @@ class Board {
         const formatNorthOrSouthHand = (hand: Hand) => 
             hand.diagram()
                 .split("\n")
-                .map((suit: string) => `${" ".repeat(13)}${suit.slice(3)}`)
+                .map((suit: string) => `${" ".repeat(13)}${suit.slice(3).padEnd(13)}`)
                 .join("\n")
         
         const westLines = west.diagram().split("\n")
@@ -109,7 +112,9 @@ class Board {
 
         const northLines = formatNorthOrSouthHand(north)
         const southLines = formatNorthOrSouthHand(south)
-        return `${northLines}\n${westAndEastLines}\n${southLines}`
+        
+        const history = `History: ${this.playedCards}\n\n`
+        return `${history}${northLines}\n${westAndEastLines}\n${southLines}`
     }
 }
 

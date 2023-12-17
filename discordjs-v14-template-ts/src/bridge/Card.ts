@@ -17,4 +17,8 @@ export class Card {
     public isHigherSuit(card: Card): boolean {
         return Card.suits.indexOf(this.suit) < Card.suits.indexOf(card.suit)
     }
+
+    public toString(): string {
+        return `${this.suit}${this.rank}`
+    }
 }

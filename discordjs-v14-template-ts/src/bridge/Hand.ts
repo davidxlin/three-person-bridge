@@ -1,7 +1,7 @@
 import { Card } from './Card'
 
 export class Hand {
-    cards: Card[]
+    readonly cards: Card[]
 
     public constructor(cards: Card[]) {
         this.cards = cards.sort((card1, card2) => {
