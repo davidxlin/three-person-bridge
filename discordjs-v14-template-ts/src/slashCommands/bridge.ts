@@ -18,8 +18,10 @@ const shuffleCommand: SlashCommand = {
 }
 
 const createInteractableHand = async (interaction: ChatInputCommandInteraction, hand: Hand, message: string) => {
-    const buttons = hand.cards
-        .map((card: Card) => new ButtonBuilder({
+    const stringToButtonMap = new Map(hand.cards
+        .map((card: Card) => [
+            `${card.suit}${card.rank}`,
+            new ButtonBuilder({
             customId: `card${card.suit}${card.rank}`,
             label: `${card.rank}`,
             style: (() => {
@@ -41,7 +43,8 @@ const createInteractableHand = async (interaction: ChatInputCommandInteraction, 
                     }
                 }
             })()
-        }))
+        })]))
+    const buttons = Array.from(stringToButtonMap.values())
     const rows = []
     for (let i = 0; i < buttons.length; i += 5) {
         const row = new ActionRowBuilder<ButtonBuilder>({
@@ -58,12 +61,19 @@ const createInteractableHand = async (interaction: ChatInputCommandInteraction, 
         componentType: ComponentType.Button
     });
 
-    collector.on("collect", (interaction) => {
-        const id = interaction.customId;
+    collector.on("collect", (i) => {
+        const id = i.customId;
         const suit = id[4]
         const rank = id[5]
         board.playCard(suit, rank)
-        interaction.deferUpdate()
+        stringToButtonMap.get(`${suit}${rank}`)!.setDisabled(true)
+        console.log("disabled")
+        interaction.editReply({
+            content: message,
+            components: rows,
+        })
+        i.deferUpdate()
+        // interaction.editReply({ content: "Click a button", components: rows[0] });
         boardInteractions.forEach(tuple => {
             tuple[0].editReply(`\`\`\`${board.diagram(tuple[1], tuple[2])}\`\`\``)
         })
