@@ -40,7 +40,6 @@ const calculateCommand : SlashCommand = {
     })
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
     execute: interaction => {
-        interaction.deferReply()
         const level = Number(interaction.options.get("level")!.value)
         const strain = String(interaction.options.get("strain")!.value)
         const tricksMadeOrDown = Number(interaction.options.get("tricks")!.value)
