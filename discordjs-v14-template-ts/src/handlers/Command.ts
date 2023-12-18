@@ -5,7 +5,7 @@ import { join } from "path";
 import { color } from "../functions";
 import { Command, SlashCommand } from "../types";
 import bridgeCommands from "../slashCommands/bridge"
-import calculateCommand from "../slashCommands/calculate"
+import calculateCommands from "../slashCommands/calculate"
 
 module.exports = (client : Client) => {
     const slashCommands : SlashCommand[] = []
@@ -24,8 +24,10 @@ module.exports = (client : Client) => {
         slashCommands.push(command)
         client.slashCommands.set(command.command.name, command)
     })
-    slashCommands.push(calculateCommand)
-    client.slashCommands.set(calculateCommand.command.name, calculateCommand)
+    calculateCommands.forEach(command => {
+        slashCommands.push(command)
+        client.slashCommands.set(command.command.name, command)
+    })
 
     readdirSync(commandsDir).forEach(file => {
         if (!file.endsWith(".js")) return;

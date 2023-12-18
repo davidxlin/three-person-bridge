@@ -1,10 +1,23 @@
 export abstract class Contract {
-    abstract score(): Number
+    readonly declarer: string
+
+    public constructor(declarer: string="") {
+        this.declarer = declarer
+    }
+    abstract score(): number
+    abstract resultString(): string
+
+    public formatContract(): string {
+        return `${this.declarer.padEnd(9, " ")}${this.resultString().padEnd(7, " ")}${this.score()}`
+    }
 }
 
 export class PassedContract extends Contract {
-    public score(): Number {
+    public score(): number {
         return 0
+    }
+    public resultString(): string {
+        return "P"
     }
 }
 
@@ -47,13 +60,65 @@ export class UnpassedContract extends Contract {
     // Number of odd tricks taken if positive, and number of tricks down if negative
     private tricksMadeOrDown: number 
 
-    constructor(vulnerability: Vulnerability, level: Level, strain: Strain, doubledState: DoubledState, tricksMadeOrDown: number) {
-        super()
+    public constructor(vulnerability: Vulnerability, level: Level, strain: Strain, doubledState: DoubledState, tricksMadeOrDown: number, declarer="") {
+        super(declarer)
         this.level = level
         this.strain = strain
         this.vulnerability = vulnerability
         this.doubledState = doubledState
         this.tricksMadeOrDown = tricksMadeOrDown
+    }
+
+    public override resultString(): string {
+        const strainString = (() => {
+            switch (this.strain) {
+                case Strain.CLUBS:
+                    return "C"
+                case Strain.DIAMONDS:
+                    return "D"
+                case Strain.HEARTS:
+                    return "H"
+                case Strain.SPADES:
+                    return "S"
+                case Strain.NOTRUMP:
+                    return "N"
+            }
+        })()
+        const doubledIndicator = (() => {
+            switch (this.doubledState) {
+                case DoubledState.UNDOUBLED: {
+                    return ""
+                }
+                case DoubledState.DOUBLED: {
+                    return "x"
+                }
+                case DoubledState.REDOUBLED: {
+                    return "xx"
+                }
+            }
+        })()
+        const tricks = (() => {
+            if (this.tricksMadeOrDown < 0) {
+                return `${this.tricksMadeOrDown}`
+            } else if (this.tricksMadeOrDown == this.level) {
+                return `=`
+            } else {
+                return `+${this.tricksMadeOrDown - this.level}`
+            }
+        })()
+        return `${this.level}${strainString}${doubledIndicator}${tricks}`
+    }
+
+    public override score(): number {
+        if (!this.madeContract()) {
+            return -this.undertrickPoints()
+        } else {
+            return this.contractTrickPoints()
+                + this.overtrickPoints()
+                + this.slamBonus()
+                + this.insultBonus()
+                + this.duplicateBonus()
+        }
     }
 
     private madeContract(): boolean {
@@ -267,20 +332,9 @@ export class UnpassedContract extends Contract {
                 })()
     }
 
-    public score(): number {
-        if (!this.madeContract()) {
-            return -this.undertrickPoints()
-        } else {
-            return this.contractTrickPoints()
-                + this.overtrickPoints()
-                + this.slamBonus()
-                + this.insultBonus()
-                + this.duplicateBonus()
-        }
-    }
 }
 
-export function createUnpassedContractUnchecked(level: number, strain: string, tricksMadeOrDown: number, doubledState: string | undefined, vulnerability: string | undefined) {
+export function createUnpassedContractUnchecked(level: number, strain: string, tricksMadeOrDown: number, doubledState: string | undefined, vulnerability: string | undefined, declarer="") {
     const v: Vulnerability = vulnerability == "v" ? Vulnerability.VULNERABLE : Vulnerability.NONVULNERABLE
     const l: Level = level
     const s: Strain = (() => {
@@ -324,7 +378,7 @@ export function createUnpassedContractUnchecked(level: number, strain: string, t
             }
         }
     })()
-    return new UnpassedContract(v, l, s, d, tricksMadeOrDown)
+    return new UnpassedContract(v, l, s, d, tricksMadeOrDown, declarer)
 }
 
 /**
