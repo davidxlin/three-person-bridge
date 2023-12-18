@@ -49,9 +49,6 @@ export class UnpassedContract extends Contract {
 
     constructor(vulnerability: Vulnerability, level: Level, strain: Strain, doubledState: DoubledState, tricksMadeOrDown: number) {
         super()
-        if (tricksMadeOrDown < -level + 6 || tricksMadeOrDown >= 0 && tricksMadeOrDown < level) {
-            throw new Error(`Invalid tricksMadeOrDown: ${tricksMadeOrDown}`)
-        }
         this.level = level
         this.strain = strain
         this.vulnerability = vulnerability
@@ -336,25 +333,25 @@ export function createUnpassedContractUnchecked(level: number, strain: string, t
  */
 export function validateInput(level: number, strain: string, tricksMadeOrDown: number, doubledState: string | undefined, vulnerability: string | undefined): string {
     if (![1, 2, 3, 4, 5, 6, 7].includes(level)) {
-        return `Invalid level ${level}: must be one of 1, 2, 3, 4, 5, 6, or 7.`
+        return `Invalid level: ${level}. Must be one of 1, 2, 3, 4, 5, 6, or 7.`
     }
     if (!["c", "d", "h", "s", "n"].includes(strain)) {
-        return `Invalid strain ${strain}: must be one of c, d, h, s, or n.`
+        return `Invalid strain: ${strain}. Must be one of c, d, h, s, or n.`
     }
     if (tricksMadeOrDown < -13) {
-        return `Invalid tricks: ${tricksMadeOrDown}: cannot be less than -13.`
+        return `Invalid tricks: ${tricksMadeOrDown}. Cannot be less than -13.`
     }
     if (tricksMadeOrDown >= 0 && tricksMadeOrDown < level) {
-        return `Invalid tricks: ${tricksMadeOrDown}: cannot be less than the contract level.`
+        return `Invalid tricks: ${tricksMadeOrDown}. Cannot be less than the contract level.`
     }
     if (tricksMadeOrDown > 7) {
-        return `Invalid tricks: ${tricksMadeOrDown}: cannot be greater than 7.`
+        return `Invalid tricks: ${tricksMadeOrDown}. Cannot be greater than 7.`
     }
     if (doubledState !== undefined && !["u", "d", "r"].includes(doubledState)) {
-        return `Invalid doubled: ${doubledState}: must be one of u, d, or r.`
+        return `Invalid doubled: ${doubledState}. Must be one of u, d, or r.`
     }
     if (vulnerability !== undefined && !["n", "v", "u"].includes(vulnerability)) {
-        return `Invalid vulnerability ${vulnerability}: must be one of n, v, or u.`
+        return `Invalid vulnerability ${vulnerability}. Must be one of n, v, or u.`
     }
     return ""
 }
