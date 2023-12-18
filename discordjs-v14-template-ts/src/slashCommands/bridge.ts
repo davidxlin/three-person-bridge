@@ -171,6 +171,41 @@ const claimCommand: SlashCommand = {
      }
 }
 
+const unplayCommand: SlashCommand = {
+    command: new SlashCommandBuilder()
+     .setName("unplay")
+     .setDescription("Unplays a card.")
+     .addStringOption(option => {
+        return option
+         .setName("suit")
+         .setDescription("The suit of the card")
+         .setRequired(true)
+     })
+     .addStringOption(option => {
+        return option
+         .setName("rank")
+         .setDescription("THe rank of the card")
+         .setRequired(true)
+     }),
+     execute: interaction => {
+        const suit = String(interaction.options.get("suit")!.value)
+        const rank = String(interaction.options.get("rank")!.value)
+        if (!Card.suits.includes(suit)) {
+            interaction.reply(`Invalid suit: ${suit}`)
+            return
+        }
+        if (!Card.ranks.includes(rank)) {
+            interaction.reply(`Invalid rank: ${suit}`)
+            return
+        }
+        board.unplayCard(suit, rank)
+        boardInteractions.forEach(tuple => {
+            tuple[0].editReply(`\`\`\`${board.diagram(tuple[1], tuple[2])}\`\`\``)
+        })
+        interaction.reply("Successfully unplayed the card.")
+     }
+}
+
 const bridgeCommands = [
     shuffleCommand,
     handCommand,
@@ -178,5 +213,6 @@ const bridgeCommands = [
     dummyPreviewCommand,
     boardCommand,
     claimCommand,
+    unplayCommand,
 ]
 export default bridgeCommands;

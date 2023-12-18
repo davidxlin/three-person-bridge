@@ -45,6 +45,13 @@ class Board {
         }
     }
 
+    public unplayCard(suit: string, rank: string) {
+        const card = this.cards.find(card => card.suit == suit && card.rank == rank)!
+        if (this.playedCards.includes(card)) {
+            this.playedCards.splice(this.playedCards.indexOf(card), 1)
+        }
+    }
+
     public claim() {
         this.cards.forEach(card => this.playCard(card.suit, card.rank))
     }
