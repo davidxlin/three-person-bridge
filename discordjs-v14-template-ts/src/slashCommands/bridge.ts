@@ -184,7 +184,7 @@ const unplayCommand: SlashCommand = {
      .addStringOption(option => {
         return option
          .setName("rank")
-         .setDescription("THe rank of the card")
+         .setDescription("The rank of the card")
          .setRequired(true)
      }),
      execute: interaction => {
