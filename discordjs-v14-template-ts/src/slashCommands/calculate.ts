@@ -126,7 +126,7 @@ const addPassScoreCommand : SlashCommand = {
      .setDescription("Adds a pass score."),
      execute: interaction => {
         scoreKeeper.addContract(new PassedContract())
-        interaction.reply("Succesfully added score.")
+        interaction.reply("Successfully added score.")
         updateScoresReplies.forEach(callback => callback())
      }
 }
