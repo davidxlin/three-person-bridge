@@ -19,6 +19,21 @@ export class Card {
     }
 
     public toString(): string {
-        return `${this.suit}${this.rank}`
+        return `${Card.suitPretty(this.suit)}${this.rank}`
+    }
+
+    public static suitPretty(suit: string): string {
+        switch (suit) {
+            case "S":
+                return "♠️"
+            case "H":
+                return "♥️"
+            case "D":
+                return "♦️"
+            case "C":
+                return "♣️"
+            default:
+                throw new Error("Invalid suit")
+        }
     }
 }
