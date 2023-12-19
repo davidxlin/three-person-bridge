@@ -6,24 +6,28 @@ import scoreKeeper from "../bridge/calculator/ScoreKeeper"
 const updateScoresReplies: (() => Promise<Message<boolean>>)[] = []
 
 function updateScores(): boolean {
-    let returnValue = true
-    let noErrors = false
-    while (!noErrors) {
-        let noErrors: boolean = true
+    let success = true
+    let noErrors: boolean = true
+    do {
+        noErrors = true
         for (let i = 0; i < updateScoresReplies.length; i++) {
             try {
                 updateScoresReplies[i]()
             } catch (e: any) {
                 if (e instanceof DiscordAPIError) {
+                    console.log(`Received error ${e}, removing score table from being updated`)
                     updateScoresReplies.splice(i)
                     noErrors = false
-                    returnValue = false
+                    success = false
                     break;
+                } else {
+                    throw e;
                 }
             }
         }
-    }
-    return returnValue
+    } while (!noErrors)
+
+    return success
 }
 const addScoreCommand : SlashCommand = {
     command: new SlashCommandBuilder()
@@ -139,7 +143,7 @@ const removeLastScoreCommand: SlashCommand = {
         scoreKeeper.removeLastContract()
         scoreKeeper.addContract(new PassedContract())
         if (updateScores()) {
-            interaction.reply("Successfully added score.")
+            interaction.reply("Successfully removed last score.")
         } else {
             interaction.reply("Please refresh /scores")
         }
