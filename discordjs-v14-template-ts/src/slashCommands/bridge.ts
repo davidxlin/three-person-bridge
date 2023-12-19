@@ -3,6 +3,7 @@ import { SlashCommand } from "../types";
 import { Card } from "../bridge/Card";
 import { Hand } from "../bridge/Hand";
 import board from "../bridge/Board"
+import { FOURTEEN_MINUTES_IN_MILLIS } from "./values";
 
 const updateBoardsReplies: (() => Promise<Message<boolean>>)[] = []
 
@@ -151,22 +152,38 @@ const playerDeclarerCommandBuilder = (name: string) =>
 
 const boardCommand: SlashCommand = {
     command: playerDeclarerCommandBuilder("board"),
-    execute: interaction => {
+    execute: async interaction => {
         const southPlayer = Number(interaction.options.get("player")!.value)
         const declarer = Number(interaction.options.get("declarer")!.value)
-        interaction.reply(`\`\`\`${board.diagram(`player${southPlayer}`, `player${declarer}`)}\`\`\``)
-        updateBoardsReplies.push(() => interaction.editReply(`\`\`\`${board.diagram(`player${southPlayer}`, `player${declarer}`)}\`\`\``))
+        const updateReply = () => interaction.editReply(`\`\`\`${board.diagram(`player${southPlayer}`, `player${declarer}`)}\`\`\``)
+        updateBoardsReplies.push(updateReply)
+
+        await interaction.reply(`\`\`\`${board.diagram(`player${southPlayer}`, `player${declarer}`)}\`\`\``)
+        // We cannot update the board after fifteen minutes, so we must
+        // remove it from the update array before that
+        setTimeout(() => {
+            updateBoardsReplies.splice(updateBoardsReplies.indexOf(updateReply))
+            interaction.editReply("This board is no longer valid. Please use /board for the current board.")
+        }, FOURTEEN_MINUTES_IN_MILLIS)
     }
 }
 
 
 const tableCommand: SlashCommand = {
     command: playerDeclarerCommandBuilder("table"),
-    execute: interaction => {
+    execute: async interaction => {
         const southPlayer = Number(interaction.options.get("player")!.value)
         const declarer = Number(interaction.options.get("declarer")!.value)
-        interaction.reply(`\`\`\`${board.tableDiagram(`player${southPlayer}`, `player${declarer}`)}\`\`\``)
-        updateBoardsReplies.push(() => interaction.editReply(`\`\`\`${board.tableDiagram(`player${southPlayer}`, `player${declarer}`)}\`\`\``))
+        const updateReply = () => interaction.editReply(`\`\`\`${board.tableDiagram(`player${southPlayer}`, `player${declarer}`)}\`\`\``)
+        updateBoardsReplies.push(updateReply)
+        
+        await interaction.reply(`\`\`\`${board.tableDiagram(`player${southPlayer}`, `player${declarer}`)}\`\`\``)
+        // We cannot update the board after fifteen minutes, so we must
+        // remove it from the update array before that
+        setTimeout(() => {
+            updateBoardsReplies.splice(updateBoardsReplies.indexOf(updateReply))
+            interaction.editReply("This table is no longer valid. Please use /table for the current table.")
+        }, FOURTEEN_MINUTES_IN_MILLIS)
     }
 }
 

@@ -2,6 +2,7 @@ import { ChannelType, Message, PermissionFlagsBits, SlashCommandBuilder } from "
 import { SlashCommand } from "../types";
 import { validateInput, createUnpassedContractUnchecked, PassedContract } from "../bridge/calculator/calculator"
 import scoreKeeper from "../bridge/calculator/ScoreKeeper"
+import { FOURTEEN_MINUTES_IN_MILLIS } from "./values";
 
 const updateScoresReplies: (() => Promise<Message<boolean>>)[] = []
 
@@ -98,10 +99,17 @@ const scoresCommand : SlashCommand = {
     command: new SlashCommandBuilder()
     .setName("scores")
     .setDescription("Displays the current score."),
-    execute: interaction => {
-        interaction.reply(scoreKeeper.table())
+    execute: async interaction => {
         const updateReply = () => interaction.editReply(scoreKeeper.table())
         updateScoresReplies.push(updateReply)
+        
+        await interaction.reply(scoreKeeper.table())
+        // We cannot update the table after fifteen minutes, so we must
+        // remove it from the update array before that
+        setTimeout(() => {
+            updateScoresReplies.splice(updateScoresReplies.indexOf(updateReply))
+            interaction.followUp("This score table is no longer being actively updated. Please use /scores for the current score table.")
+        }, FOURTEEN_MINUTES_IN_MILLIS)
     }
 }
 
