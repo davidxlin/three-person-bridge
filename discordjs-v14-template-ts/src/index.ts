@@ -1,10 +1,12 @@
-import { Client, GatewayIntentBits, Collection, PermissionFlagsBits,} from "discord.js";
-const { Guilds, MessageContent, GuildMessages, GuildMembers } = GatewayIntentBits
-const client = new Client({intents:[Guilds, MessageContent, GuildMessages, GuildMembers]})
-import { Command, SlashCommand } from "./types";
-import { config } from "dotenv";
-import { readdirSync } from "fs";
-import { join } from "path";
+import {Client, GatewayIntentBits, Collection, PermissionFlagsBits,} from "discord.js";
+
+const {Guilds, MessageContent, GuildMessages, GuildMembers} = GatewayIntentBits
+const client = new Client({intents: [Guilds, MessageContent, GuildMessages, GuildMembers]})
+import {Command, SlashCommand} from "./types";
+import {config} from "dotenv";
+import {readdirSync} from "fs";
+import {join} from "path";
+
 config()
 
 client.slashCommands = new Collection<string, SlashCommand>()
@@ -18,3 +20,5 @@ readdirSync(handlersDir).forEach(handler => {
 })
 
 client.login(process.env.TOKEN)
+
+export default client
