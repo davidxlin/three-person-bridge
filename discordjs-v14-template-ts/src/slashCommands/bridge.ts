@@ -216,9 +216,9 @@ const claimCommand: SlashCommand = {
     }
 }
 
-const unplayCommand: SlashCommand = {
-    command: new SlashCommandBuilder()
-        .setName("unplay")
+function cardSlashCommandBuilder(name: string): Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup"> {
+    return new SlashCommandBuilder()
+        .setName(name)
         .setDescription("Unplays a card.")
         .addStringOption(option => {
             return option
@@ -231,24 +231,54 @@ const unplayCommand: SlashCommand = {
                 .setName("rank")
                 .setDescription("The rank of the card")
                 .setRequired(true)
-        }),
+        })
+}
+
+function getSuitAndRankFromOptionsChecked(interaction: ChatInputCommandInteraction<CacheType>): string[] | undefined {
+    const suit = interaction.options.get("suit")!.value as string
+    const rank = interaction.options.get("rank")!.value as string
+    if (!Card.suits.includes(suit)) {
+        interaction.reply(`Invalid suit: ${suit}`)
+        return 
+    }
+    if (!Card.ranks.includes(rank)) {
+        interaction.reply(`Invalid rank: ${suit}`)
+        return 
+    }
+    return [suit, rank]
+}
+
+const unplayCommand: SlashCommand = {
+    command: cardSlashCommandBuilder("unplay"),
     execute: interaction => {
-        const suit = String(interaction.options.get("suit")!.value)
-        const rank = String(interaction.options.get("rank")!.value)
-        if (!Card.suits.includes(suit)) {
-            interaction.reply(`Invalid suit: ${suit}`)
-            return
+        const suitAndRank = getSuitAndRankFromOptionsChecked(interaction)
+        if (!suitAndRank) {
+            return;
         }
-        if (!Card.ranks.includes(rank)) {
-            interaction.reply(`Invalid rank: ${suit}`)
-            return
-        }
+        const suit = suitAndRank[0]
+        const rank = suitAndRank[1]
+
         board.unplayCard(suit, rank)
         updateBoardsReplies.forEach(callback => callback())
         interaction.reply("Successfully unplayed the card.")
     }
 }
 
+const playCommand: SlashCommand = {
+    command: cardSlashCommandBuilder("play"),
+    execute: interaction => {
+        const suitAndRank = getSuitAndRankFromOptionsChecked(interaction)
+        if (!suitAndRank) {
+            return;
+        }
+        const suit = suitAndRank[0]
+        const rank = suitAndRank[1]
+
+        board.playCard(suit, rank)
+        updateBoardsReplies.forEach(callback => callback())
+        interaction.reply("Successfully played the card.")
+    }
+}
 
 function createCategory(categoryName: string, guild: Guild) {
     let category = guild.channels.cache.find(channel => channel.name === categoryName)
@@ -402,6 +432,7 @@ const bridgeCommands = [
     tableCommand,
     claimCommand,
     unplayCommand,
+    playCommand,
     startGameCommand,
 ]
 export default bridgeCommands;
