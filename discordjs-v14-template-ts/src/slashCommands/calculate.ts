@@ -1,30 +1,10 @@
-import { ChannelType, Message, PermissionFlagsBits, SlashCommandBuilder, DiscordAPIError } from "discord.js";
+import { ChannelType, Message, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { SlashCommand } from "../types";
 import { validateInput, createUnpassedContractUnchecked, PassedContract } from "../bridge/calculator/calculator"
 import scoreKeeper from "../bridge/calculator/ScoreKeeper"
 
 const updateScoresReplies: (() => Promise<Message<boolean>>)[] = []
 
-function updateScores(): boolean {
-    let returnValue = true
-    let noErrors = false
-    while (!noErrors) {
-        let noErrors: boolean = true
-        for (let i = 0; i < updateScoresReplies.length; i++) {
-            try {
-                updateScoresReplies[i]()
-            } catch (e: any) {
-                if (e instanceof DiscordAPIError) {
-                    updateScoresReplies.splice(i)
-                    noErrors = false
-                    returnValue = false
-                    break;
-                }
-            }
-        }
-    }
-    return returnValue
-}
 const addScoreCommand : SlashCommand = {
     command: new SlashCommandBuilder()
     .setName("addscore")
@@ -97,11 +77,8 @@ const addScoreCommand : SlashCommand = {
         } else {
             const contract = createUnpassedContractUnchecked(level, strain, tricksMadeOrDown, doubledState, vulnerability, declarer)
             scoreKeeper.addContract(contract)
-            if (updateScores()) {
-                interaction.reply("Successfully added score.")
-            } else {
-                interaction.reply("Please refresh /scores")
-            }
+            interaction.reply("Successfully added score.")
+            updateScoresReplies.forEach(callback => callback())
         }
     },
 }
@@ -112,11 +89,8 @@ const addPassScoreCommand : SlashCommand = {
      .setDescription("Adds a pass score."),
      execute: interaction => {
         scoreKeeper.addContract(new PassedContract())
-        if (updateScores()) {
-            interaction.reply("Successfully added score.")
-        } else {
-            interaction.reply("Please refresh /scores")
-        }
+        interaction.reply("Successfully added score.")
+        updateScoresReplies.forEach(callback => callback())
      }
 }
 
@@ -137,12 +111,8 @@ const removeLastScoreCommand: SlashCommand = {
      .setDescription("Removes the last score."),
      execute: interaction => {
         scoreKeeper.removeLastContract()
-        scoreKeeper.addContract(new PassedContract())
-        if (updateScores()) {
-            interaction.reply("Successfully added score.")
-        } else {
-            interaction.reply("Please refresh /scores")
-        }
+        interaction.reply("Successfully removed last score.")
+        updateScoresReplies.forEach(callback => callback())
      }
 }
 
