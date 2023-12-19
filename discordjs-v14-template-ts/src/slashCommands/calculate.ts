@@ -85,7 +85,7 @@ const addScoreCommand : SlashCommand = {
 
 const addPassScoreCommand : SlashCommand = {
     command: new SlashCommandBuilder()
-     .setName("addpasscore")
+     .setName("addpassscore")
      .setDescription("Adds a pass score."),
      execute: interaction => {
         scoreKeeper.addContract(new PassedContract())
