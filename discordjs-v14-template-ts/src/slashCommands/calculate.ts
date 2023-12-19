@@ -81,6 +81,13 @@ const addScoreCommand : SlashCommand = {
         .setName("strain")
         .setDescription("Strain of the contract.")
         .setRequired(true)
+        .addChoices(
+            { name: "Clubs", value: "c" },
+            { name: "Diamonds", value: "d" },
+            { name: "Hearts", value: "h" },
+            { name: "Spades", value: "s" },
+            { name: "Notrump", value: "n" },
+        )
     })
     .addIntegerOption(option => {
         return option
@@ -94,11 +101,20 @@ const addScoreCommand : SlashCommand = {
         return option
         .setName("doubled")
         .setDescription("Doubled state of the contract.")
+        .addChoices(
+            { name: "Undoubled", value: "u" },
+            { name: "Doubled", value: "d" },
+            { name: "Redoubled", value: "r" },
+        )
     })
     .addStringOption(option => {
         return option
         .setName("vulnerability")
         .setDescription("Vulnerability of declaring side.")
+        .addChoices(
+            { name: "Non-vulnerable", value: "n" },
+            { name: "Vulnerable", value: "v" },
+        )
     }),
     execute: interaction => {
         const declarer = String(interaction.options.get("declarer")!.value)
