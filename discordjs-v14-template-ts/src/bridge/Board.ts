@@ -85,7 +85,7 @@ class Board {
         }
     }
 
-    public diagram(southPlayer: string, declarer: string): string {
+    private southNorthEastWestPlayedCards(southPlayer: string, declarer: string): Hand[] {
         const order = (() => {
             switch (declarer) {
                 case "player1":
@@ -103,6 +103,24 @@ class Board {
         const north = filterPlayedCards(this.getHand(`${order[(order.indexOf(southPlayer) + 2) % 4]}-hand`))
         const east = filterPlayedCards(this.getHand(`${order[(order.indexOf(southPlayer) + 3) % 4]}-hand`))
         const west = filterPlayedCards(this.getHand(`${order[(order.indexOf(southPlayer) + 1) % 4]}-hand`))
+        return [south, north, east, west]
+    }
+
+    public tableDiagram(southPlayer: string, declarer: string): string {
+        const [south, north, east, west] = this.southNorthEastWestPlayedCards(southPlayer, declarer)
+        const topLine = `  ${north.cards.join(" ")}`
+        const bottomLine = `  ${south.cards.join(" ")}`
+        const middleLines = []
+        for (let i = 0; i < 13; i++) {
+            const westCardString = i < west.cards.length ? `${west.cards[i]}` : " "
+            const eastCardString = i < east.cards.length ? `${east.cards[i]}` : " "
+            middleLines.push(`${westCardString}${" ".repeat(39)}${eastCardString}`)
+        }
+        return `${topLine}\n${middleLines.join("\n")}\n${bottomLine}`
+    }
+
+    public diagram(southPlayer: string, declarer: string): string {
+        const [south, north, east, west] = this.southNorthEastWestPlayedCards(southPlayer, declarer)
 
         const formatNorthOrSouthHand = (hand: Hand) => 
             hand.diagram()

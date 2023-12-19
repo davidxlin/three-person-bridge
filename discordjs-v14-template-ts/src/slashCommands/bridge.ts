@@ -1,10 +1,10 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, ComponentType, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, ComponentType, Message, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { SlashCommand } from "../types";
 import { Card } from "../bridge/Card";
 import { Hand } from "../bridge/Hand";
 import board from "../bridge/Board"
 
-const boardInteractions : any[] = []
+const updateBoardsReplies: (() => Promise<Message<boolean>>)[] = []
 
 const shuffleCommand: SlashCommand = {
     command: new SlashCommandBuilder()
@@ -12,7 +12,7 @@ const shuffleCommand: SlashCommand = {
      .setDescription("Start a new game."),
      execute: interaction => {
         board.shuffle()
-        boardInteractions.length = 0
+        updateBoardsReplies.length = 0
         interaction.reply("New game sucessfully loaded in backend.")
      }
 }
@@ -73,9 +73,7 @@ const createInteractableHand = async (interaction: ChatInputCommandInteraction, 
             components: rows,
         })
         i.deferUpdate()
-        boardInteractions.forEach(tuple => {
-            tuple[0].editReply(`\`\`\`${board.diagram(tuple[1], tuple[2])}\`\`\``)
-        })
+        updateBoardsReplies.forEach(callback => callback())
     })
 }
 
@@ -130,12 +128,12 @@ const dummyCommand: SlashCommand = {
      }
 }
 
-const boardCommand: SlashCommand = {
-    command: new SlashCommandBuilder()
-    .setName("board")
+const playerDeclarerCommandBuilder = (name: string) => 
+    new SlashCommandBuilder()
+    .setName(name)
     .setDescription("View played cards.")
     .addIntegerOption(option => {
-       return option
+    return option
         .setName("player")
         .setMaxValue(3)
         .setMinValue(1)
@@ -144,17 +142,31 @@ const boardCommand: SlashCommand = {
     })
     .addIntegerOption(option => {
         return option
-         .setName("declarer")
-         .setMaxValue(3)
-         .setMinValue(1)
-         .setDescription("Declarer's player number")
-         .setRequired(true)
-    }),
+        .setName("declarer")
+        .setMaxValue(3)
+        .setMinValue(1)
+        .setDescription("Declarer's player number")
+        .setRequired(true)
+    })
+
+const boardCommand: SlashCommand = {
+    command: playerDeclarerCommandBuilder("board"),
     execute: interaction => {
         const southPlayer = Number(interaction.options.get("player")!.value)
         const declarer = Number(interaction.options.get("declarer")!.value)
         interaction.reply(`\`\`\`${board.diagram(`player${southPlayer}`, `player${declarer}`)}\`\`\``)
-        boardInteractions.push([interaction, `player${southPlayer}`, `player${declarer}`])
+        updateBoardsReplies.push(() => interaction.editReply(`\`\`\`${board.diagram(`player${southPlayer}`, `player${declarer}`)}\`\`\``))
+    }
+}
+
+
+const tableCommand: SlashCommand = {
+    command: playerDeclarerCommandBuilder("table"),
+    execute: interaction => {
+        const southPlayer = Number(interaction.options.get("player")!.value)
+        const declarer = Number(interaction.options.get("declarer")!.value)
+        interaction.reply(`\`\`\`${board.tableDiagram(`player${southPlayer}`, `player${declarer}`)}\`\`\``)
+        updateBoardsReplies.push(() => interaction.editReply(`\`\`\`${board.tableDiagram(`player${southPlayer}`, `player${declarer}`)}\`\`\``))
     }
 }
 
@@ -164,10 +176,8 @@ const claimCommand: SlashCommand = {
      .setDescription("Reveals all played cards."),
      execute: interaction => {
         board.claim()
-        boardInteractions.forEach(tuple => {
-            tuple[0].editReply(`\`\`\`${board.diagram(tuple[1], tuple[2])}\`\`\``)
-        })
         interaction.reply("Successfully revealed all cards.")
+        updateBoardsReplies.forEach(callback => callback())
      }
 }
 
@@ -199,9 +209,7 @@ const unplayCommand: SlashCommand = {
             return
         }
         board.unplayCard(suit, rank)
-        boardInteractions.forEach(tuple => {
-            tuple[0].editReply(`\`\`\`${board.diagram(tuple[1], tuple[2])}\`\`\``)
-        })
+        updateBoardsReplies.forEach(callback => callback())
         interaction.reply("Successfully unplayed the card.")
      }
 }
@@ -212,6 +220,7 @@ const bridgeCommands = [
     dummyCommand,
     dummyPreviewCommand,
     boardCommand,
+    tableCommand,
     claimCommand,
     unplayCommand,
 ]
