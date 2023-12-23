@@ -32,7 +32,7 @@ const shuffleCommand: SlashCommand = {
     execute: interaction => {
         board.shuffle()
         updateBoardsReplies.length = 0
-        interaction.reply("New game sucessfully loaded in backend.")
+        interaction.reply("New game successfully loaded in backend.")
     }
 }
 
@@ -180,8 +180,10 @@ const boardCommand: SlashCommand = {
         // We cannot update the board after fifteen minutes, so we must
         // remove it from the update array before that
         setTimeout(() => {
-            updateBoardsReplies.splice(updateBoardsReplies.indexOf(updateReply))
-            interaction.editReply("This board is no longer valid. Please use /board for the current board.")
+            if (updateBoardsReplies.includes(updateReply)) {
+                updateBoardsReplies.splice(updateBoardsReplies.indexOf(updateReply))
+                interaction.editReply("This board is no longer valid. Please use /board for the current board.")
+            }
         }, FOURTEEN_MINUTES_IN_MILLIS)
     }
 }
@@ -199,8 +201,10 @@ const tableCommand: SlashCommand = {
         // We cannot update the board after fifteen minutes, so we must
         // remove it from the update array before that
         setTimeout(() => {
-            updateBoardsReplies.splice(updateBoardsReplies.indexOf(updateReply))
-            interaction.editReply("This table is no longer valid. Please use /table for the current table.")
+            if (updateBoardsReplies.includes(updateReply)) {
+                updateBoardsReplies.splice(updateBoardsReplies.indexOf(updateReply))
+                interaction.editReply("This table is no longer valid. Please use /table for the current table.")
+            }
         }, FOURTEEN_MINUTES_IN_MILLIS)
     }
 }
