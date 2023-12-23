@@ -141,7 +141,6 @@ const dummyCommand: SlashCommand = {
         .setName("dummy")
         .setDescription("Get interactable dummy hand."),
     execute: async interaction => {
-        throw new Error("haha")
         const hand = board.getHand(`dummy-hand`)
         const message = `Dummy's interactable hand:`
         createInteractableHand(interaction, hand, message)
