@@ -133,9 +133,9 @@ const calculateCommandsUnsafe = [
 
 const calculateCommands = calculateCommandsUnsafe.map(command => {
     const newCommand = Object.assign({}, command)
-    newCommand.execute = (interaction: ChatInputCommandInteraction) => {
+    newCommand.execute = async interaction => {
         try {
-            command.execute(interaction)
+            await command.execute(interaction)
         } catch (e: any) {
             console.log(`${e}`)
         }

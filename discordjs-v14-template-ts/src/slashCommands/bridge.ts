@@ -141,6 +141,7 @@ const dummyCommand: SlashCommand = {
         .setName("dummy")
         .setDescription("Get interactable dummy hand."),
     execute: async interaction => {
+        throw new Error("haha")
         const hand = board.getHand(`dummy-hand`)
         const message = `Dummy's interactable hand:`
         createInteractableHand(interaction, hand, message)
@@ -442,9 +443,9 @@ const bridgeCommandsUnsafe = [
 
 const bridgeCommands = bridgeCommandsUnsafe.map(command => {
     const newCommand = Object.assign({}, command)
-    newCommand.execute = (interaction: ChatInputCommandInteraction) => {
+    newCommand.execute = async interaction => {
         try {
-            command.execute(interaction)
+            await command.execute(interaction)
         } catch (e: any) {
             console.log(`${e}`)
         }
