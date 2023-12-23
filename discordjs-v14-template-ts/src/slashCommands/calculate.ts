@@ -107,7 +107,7 @@ const scoresCommand : SlashCommand = {
         // We cannot update the table after fifteen minutes, so we must
         // remove it from the update array before that
         setTimeout(() => {
-            updateScoresReplies.splice(updateScoresReplies.indexOf(updateReply))
+            updateScoresReplies.splice(updateScoresReplies.indexOf(updateReply), 1)
             interaction.followUp("This score table is no longer being actively updated. Please use /scores for the current score table.")
         }, FOURTEEN_MINUTES_IN_MILLIS)
     }

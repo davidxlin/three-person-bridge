@@ -181,7 +181,7 @@ const boardCommand: SlashCommand = {
         // remove it from the update array before that
         setTimeout(() => {
             if (updateBoardsReplies.includes(updateReply)) {
-                updateBoardsReplies.splice(updateBoardsReplies.indexOf(updateReply))
+                updateBoardsReplies.splice(updateBoardsReplies.indexOf(updateReply), 1)
                 interaction.editReply("This board is no longer valid. Please use /board for the current board.")
             }
         }, FOURTEEN_MINUTES_IN_MILLIS)
@@ -202,7 +202,7 @@ const tableCommand: SlashCommand = {
         // remove it from the update array before that
         setTimeout(() => {
             if (updateBoardsReplies.includes(updateReply)) {
-                updateBoardsReplies.splice(updateBoardsReplies.indexOf(updateReply))
+                updateBoardsReplies.splice(updateBoardsReplies.indexOf(updateReply), 1)
                 interaction.editReply("This table is no longer valid. Please use /table for the current table.")
             }
         }, FOURTEEN_MINUTES_IN_MILLIS)
