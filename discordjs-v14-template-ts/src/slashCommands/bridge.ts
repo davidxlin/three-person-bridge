@@ -427,7 +427,7 @@ const startGameCommand: SlashCommand = {
     }
 }
 
-const bridgeCommands = [
+const bridgeCommandsUnsafe = [
     shuffleCommand,
     handCommand,
     dummyCommand,
@@ -439,4 +439,17 @@ const bridgeCommands = [
     playCommand,
     startGameCommand,
 ]
+
+const bridgeCommands = bridgeCommandsUnsafe.map(command => {
+    const newCommand = Object.assign({}, command)
+    newCommand.execute = (interaction: ChatInputCommandInteraction) => {
+        try {
+            command.execute(interaction)
+        } catch (e: any) {
+            console.log(`${e}`)
+        }
+    }
+    return newCommand
+})
+
 export default bridgeCommands;

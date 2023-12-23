@@ -1,4 +1,4 @@
-import { ChannelType, Message, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { ChannelType, ChatInputCommandInteraction, Message, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { SlashCommand } from "../types";
 import { validateInput, createUnpassedContractUnchecked, PassedContract } from "../bridge/calculator/calculator"
 import scoreKeeper from "../bridge/calculator/ScoreKeeper"
@@ -124,10 +124,23 @@ const removeLastScoreCommand: SlashCommand = {
      }
 }
 
-const calculateCommands = [
+const calculateCommandsUnsafe = [
     addScoreCommand,
     scoresCommand,
     addPassScoreCommand,
     removeLastScoreCommand,
 ]
+
+const calculateCommands = calculateCommandsUnsafe.map(command => {
+    const newCommand = Object.assign({}, command)
+    newCommand.execute = (interaction: ChatInputCommandInteraction) => {
+        try {
+            command.execute(interaction)
+        } catch (e: any) {
+            console.log(`${e}`)
+        }
+    }
+    return newCommand
+})
+
 export default calculateCommands
