@@ -6,6 +6,7 @@ import { color } from "../functions";
 import { Command, SlashCommand } from "../types";
 import bridgeCommands from "../slashCommands/bridge"
 import calculateCommands from "../slashCommands/calculate"
+import monopolyCommands from "../slashCommands/monopoly"
 
 module.exports = (client : Client) => {
     const slashCommands : SlashCommand[] = []
@@ -25,6 +26,10 @@ module.exports = (client : Client) => {
         client.slashCommands.set(command.command.name, command)
     })
     calculateCommands.forEach(command => {
+        slashCommands.push(command)
+        client.slashCommands.set(command.command.name, command)
+    })
+    monopolyCommands.forEach(command => {
         slashCommands.push(command)
         client.slashCommands.set(command.command.name, command)
     })
