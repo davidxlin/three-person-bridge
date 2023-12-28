@@ -1,4 +1,8 @@
-export const boardInfo = JSON.parse( 
+import { Tile, GoTile, CommunityChestTile, PropertyTile, ChanceTile, JailTile, FreeParkingTile, GoToJailTile, UtilityTile, RailroadTile, ColorTile, TaxTile } from './Tile'
+import { Card, ChanceCard, CommunityChestCard } from './Card'
+import { Player } from './Player'
+import { ActivityFlagsBitField } from 'discord.js'
+const json = JSON.parse( 
 `{
     "properties": [
       {
@@ -1004,3 +1008,172 @@ export const boardInfo = JSON.parse(
     ]
   }`
 )
+
+class Board {
+    private tiles: Tile[]
+    private chance: ChanceCard[]
+    private communityChest: CommunityChestCard[]
+    private players: Player[] = []
+
+    constructor() {
+        this.tiles = json.tiles.map((info: any, i: number) => {
+            const id: string = info.id
+            const property: any = json.properties.find((property: any) => property.id == id)
+            const name: string = property.name
+            if (name == 'Go') {
+                return new GoTile(name, i)
+            } else if (name == 'Community Chest') {
+                return new CommunityChestTile(name, i)
+            } else if (name == 'Chance') {
+                return new ChanceTile(name, i)
+            } else if (name == 'Jail / Just Visiting') {
+                return new JailTile(name, i)
+            } else if (name == 'Free Parking') {
+                return new FreeParkingTile(name, i)
+            } else if (name == 'Go To Jail') {
+                return new GoToJailTile(name, i)
+            } else if (name == 'Income Tax') {
+                return new TaxTile(name, i, 200)
+            } else if (name == 'Luxury Tax') {
+                return new TaxTile(name, i, 100)
+            } else if (property.hasOwnProperty('group')) {
+                const group: string = property.group
+                const price: number = property.price
+                if (group == 'Utilities') {
+                    return new UtilityTile(name, i, price)
+                } else if (group == 'Railroad') {
+                    return new RailroadTile(name, i, price)
+                } else {
+                    // Color Tile
+                    const color: string = group
+                    const rent: number[] = property.multpliedrent
+                    const houseCost = property.housecost
+                    return new ColorTile(name, i, price, color, rent, houseCost)
+                }
+            }
+        })
+        this.chance = json.chance.map((e: any) => new ChanceCard(e.title))
+        this.communityChest = json.communitychest.map((e: any) => new CommunityChestCard(e.title))
+    }
+
+    public getTileNames(): string[] {
+      return this.tiles.map(tile => tile.name)
+    }
+
+    public getTileByName(name: string): Tile | undefined {
+      return this.tiles.find(tile => tile.name == name)
+    }
+
+    public getChanceDescriptions(): string[] {
+      return this.chance.map(chance => chance.description).sort()
+    }
+
+    public getCommunityChestDescriptions(): string[] {
+      return this.communityChest.map(communityChest => communityChest.description).sort()
+    }
+
+    private drawCard(cards: Card[]) {
+      const card = cards[cards.length - 1]
+      cards.pop()
+      cards.unshift(card)
+      return card
+    }
+
+    public drawChance(): Card {
+      return this.drawCard(this.chance)
+    }
+
+    public drawCommunityChest(): Card {
+      return this.drawCard(this.communityChest)
+    }
+
+    public diceRoll(): number[] {
+      const dice1 = Math.floor(Math.random() * 6) + 1
+      const dice2 = Math.floor(Math.random() * 6) + 1
+      return dice1 < dice2 ? [dice1, dice2] : [dice2, dice1]
+    }
+
+    public addPlayer(name: string) {
+      this.players.push(new Player(name))
+    }
+
+    public getPlayerByName(name: string): Player | undefined {
+      return this.players.find(player => player.name == name)
+    }
+
+    public addMoney(playerName: string, amount: number): boolean {
+      const player = this.getPlayerByName(playerName)
+      if (!player) {
+        return false
+      }
+      player.money += amount
+      return true
+    }
+
+    public addProperty(playerName: string, propertyName: string): boolean {
+      const player = this.getPlayerByName(playerName)
+      const property = this.getTileByName(propertyName)
+      if (!player || !(property instanceof PropertyTile)) {
+        return false
+      }
+      player.properties.push(property)
+      return true
+    }
+
+    public removeProperty(playerName: string, propertyName: string): boolean {
+      const player = this.getPlayerByName(playerName)
+      const property = this.getTileByName(propertyName)
+      if (!player || !(property instanceof PropertyTile)) {
+        return false
+      }
+      const index = player.properties.indexOf(property)
+      if (index == -1) {
+        return false
+      }
+      player.properties.splice(index, 1)
+      return true
+    }
+
+    public addGetOutOfJailFreeCards(playerName: string, quantity: number) {
+      const player = this.getPlayerByName(playerName)
+      if (!player) {
+        return false
+      }
+      player.numGetOutOfJailFreeCards += quantity
+      return true
+    }
+
+    public toString(): string {
+      return `${this.tiles}`
+    }
+
+    public setPosition(playerName: string, position: string): boolean {
+      const player = this.getPlayerByName(playerName)
+      if (!player) {
+        return false
+      }
+      player.position = position
+      return true
+    }
+
+    public setMortgaged(propertyName: string, mortgaged: boolean): boolean {
+      const property = this.getTileByName(propertyName)
+      if (!(property instanceof PropertyTile)) {
+        return false
+      }
+      property.mortgaged = mortgaged
+      return true
+    }
+
+    public setNumHouses(propertyName: string, numHouses: number): boolean {
+      const property = this.getTileByName(propertyName)
+      if (!(property instanceof ColorTile)) {
+        return false
+      }
+      property.numHouses = numHouses
+      return true
+    }
+}
+
+const board = new Board()
+export default board
