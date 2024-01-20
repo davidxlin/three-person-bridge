@@ -11,6 +11,6 @@ export class Player {
     }
 
     public toString(): string {
-        return `Player(name=${this.name},position=${this.position},money=${this.money},numGetOutOfJailFreeCards=${this.numGetOutOfJailFreeCards}),properties=${this.properties})`
+        return `Player(name=${this.name},position=${this.position},money=${this.money},numGetOutOfJailFreeCards=${this.numGetOutOfJailFreeCards}),properties=${this.properties.map(property => property.name)})`
     }
 }

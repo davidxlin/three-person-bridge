@@ -1094,6 +1094,17 @@ class Board {
     }
 
     public addPlayer(name: string) {
+      const shuffleArray = (array: Object[]) => {
+          for (let i = array.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              const temp = array[i];
+              array[i] = array[j];
+              array[j] = temp;
+          }
+      }
+      shuffleArray(this.chance)
+      shuffleArray(this.communityChest)
+
       this.players.push(new Player(name))
     }
 
