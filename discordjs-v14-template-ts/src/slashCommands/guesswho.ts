@@ -4,23 +4,32 @@ import {
     ButtonStyle,
     ChatInputCommandInteraction,
     ComponentType,
-    SlashCommandBuilder
+    SlashCommandBuilder,
 } from "discord.js";
 import {SlashCommand} from "../types";
 import { people } from '../guesswho/people'
 import { commits } from '../guesswho/commits'
+import { Save } from '../guesswho/save'
+import { FOURTEEN_MINUTES_IN_MILLIS } from "./values";
 
-const createGuesswhoBoard = async (interaction: ChatInputCommandInteraction, message: string) => {
+const saves = new Map<string, Save>()
+const expireCallbacks = new Map<string, () => void>()
+
+const createGuesswhoBoard = async (interaction: ChatInputCommandInteraction, saveKey: string, message: string) => {
     const guesswhoPersonButtonPrefix = 'guesswhoPerson'
-    const evenPressedStyle = ButtonStyle.Primary
-    const oddPressedStyle = ButtonStyle.Secondary
+    const upStyle = ButtonStyle.Primary
+    const downStyle = ButtonStyle.Secondary
+
+    const save = saves.get(saveKey) ?? new Save()
+    saves.set(saveKey, save)
+
     const personToButtonMap = new Map(people
         .map((person: string) => [
             person,
             new ButtonBuilder({
                 customId: `${guesswhoPersonButtonPrefix}${person}`,
-                label: person,
-                style: evenPressedStyle,
+                label: save.isUp(person) ? person : Array.from(person).map(c => `${c}\u0336`).join(""),
+                style: save.isUp(person) ? upStyle : downStyle,
             })
         ]))
     const buttons = Array.from(personToButtonMap.values())
@@ -35,33 +44,55 @@ const createGuesswhoBoard = async (interaction: ChatInputCommandInteraction, mes
         content: message,
         components: rows,
     });
-
+    
     const collector = response.createMessageComponentCollector({
         componentType: ComponentType.Button
     });
-
     collector.on("collect", (i) => {
         const id = i.customId;
         const person = id.substring(guesswhoPersonButtonPrefix.length)
         const button = personToButtonMap.get(person)!
-        const oddPressed = button.data.style! == evenPressedStyle
-        button.setStyle(oddPressed ? oddPressedStyle : evenPressedStyle)
-        button.setLabel(oddPressed ? Array.from(person).map(c => `${c}\u0336`).join("") : person)
+        save.toggle(person)
+        button.setStyle(save.isUp(person) ? upStyle : downStyle)
+        button.setLabel(save.isUp(person) ? person : Array.from(person).map(c => `${c}\u0336`).join(""))
         interaction.editReply({
             content: message,
             components: rows,
         })
         i.deferUpdate()
     })
+
+    expireCallbacks.set(saveKey, () => {
+        buttons.forEach(button => {button.setDisabled(true)})
+        interaction.editReply({
+            content: `This board under save key ${saveKey} is now expired!`,
+            components: rows,
+        })
+    })
 }
 
 const peopleCommand: SlashCommand = {
     command: new SlashCommandBuilder()
         .setName("people")
-        .setDescription("Get interactable buttons for each person."),
+        .setDescription("Get interactable buttons for each person.")
+        .addStringOption(option => {
+            return option
+                .setName("savekey")
+                .setDescription("The key under which the button states are saved.")
+                .setRequired(true)
+        }),
     execute: interaction => {
-        const message = "Guess who people: "
-        createGuesswhoBoard(interaction, message)
+        const saveKey = String(interaction.options.get("savekey")!.value)
+        const message = `Guess who people under save key ${saveKey}: `
+        createGuesswhoBoard(interaction, saveKey, message)
+
+        // The buttons stop after 15 minutes, so we must disable them before then.
+        setTimeout(() => {
+            const callback = expireCallbacks.get(saveKey)
+            if (callback !== undefined) {
+                callback()
+            }
+        }, FOURTEEN_MINUTES_IN_MILLIS)
     }
 }
 
