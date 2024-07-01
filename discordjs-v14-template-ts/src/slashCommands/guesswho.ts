@@ -115,8 +115,16 @@ const commitCommand: SlashCommand = {
     execute: interaction => {
         const key = String(interaction.options.get("key")!.value)
         const commit = String(interaction.options.get("commitment")!.value)
-        commits.set(key, commit)
-        interaction.reply(`Successfully commited to the key ${key}`)
+        if (!commits.has(key)) {
+            commits.set(key, commit)
+            interaction.reply( {
+                content: `Successfully commited to the key ${key}`,
+                ephemeral: true,
+            })
+        } else {
+            interaction.reply('No cheating cannot use the same key!')
+        }
+        
     }
 }
 
@@ -125,7 +133,7 @@ const showCommitsCommand: SlashCommand = {
         .setName("showcommits")
         .setDescription("Show all commitments."),
     execute: interaction => {
-        const array= Array.from(commits).map(key => `${key}\t`)
+        const array = Array.from(commits).map(key => `${key}\t`)
         interaction.reply(`Commitments: ${array}`)
     }
 }
