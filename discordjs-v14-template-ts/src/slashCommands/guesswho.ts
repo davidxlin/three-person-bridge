@@ -133,8 +133,8 @@ const showCommitsCommand: SlashCommand = {
         .setName("showcommits")
         .setDescription("Show all commitments."),
     execute: interaction => {
-        const array = Array.from(commits).map(key => `${key}\t`)
-        interaction.reply(`Commitments: ${array}`)
+        const array = Array.from(commits).map(key => `- ${key}`)
+        interaction.reply(`Commitments:\n${array.join('\n')}`)
     }
 }
 
